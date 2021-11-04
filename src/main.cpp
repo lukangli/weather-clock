@@ -12,7 +12,6 @@ void setup() {
     EEPROM.begin(1024);
 
     TftDisplay*  tftDisplay  = TftDisplay::getInstance();
-    CityWeather* cityWeather = CityWeather::getInstance();
 
     WiFi.begin("kanglu", "zxcvbnm123");
     while (WiFi.status() != WL_CONNECTED) {
@@ -26,8 +25,8 @@ void setup() {
     while (tftDisplay->loading(30) < 194);
     Serial.println("连接wifi成功！");
 
-    tftDisplay->displayTempHumidity();
-    cityWeather->getCityCode();
+    //显示天气信息
+    TftDisplay::getInstance()->displayWeather();
 }
 
 void loop() {
