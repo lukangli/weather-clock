@@ -87,14 +87,21 @@ public:
     //进度条加载
     uint16 loading(byte delayTime);
 
-    //显示温湿度图标
-    void displayTempHumidity();
+    //显示天气到屏幕
+    void displayWeather();
 
-    //图片显示回调函数
-    static bool tft_output(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t* bitmap);
+private:
+    //显示温湿度到屏幕(进度条方式)
+    void humidityTempProgressBar(int32_t num, int32_t col, int32_t x, int32_t y);
+
+    //显示温湿度到屏幕(数字方式)
+    void humidityTempNum(const String &str, int32_t x, int32_t y);
 
     //显示天气图标
     void printfWeather(int x, int y, int num);
+
+    //显示温湿度图标
+    void displayTempHumidity();
 
     //显示白色36*60大小数字
     void printfW3660(int x,int y,int num);
@@ -105,15 +112,8 @@ public:
     //显示白色18*30大小数字
     void printfW1830(int x,int y,int num);
 
-    //显示天气到屏幕
-    void displayWeather();
-
-private:
-    //显示温湿度到屏幕(进度条方式)
-    void humidityTempProgressBar(int32_t num, int32_t col, int32_t x, int32_t y);
-
-    //显示温湿度到屏幕(数字方式)
-    void humidityTempNum(const String &str, int32_t x, int32_t y);
+    //图片显示回调函数
+    static bool tft_output(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t* bitmap);
 };
 
 #endif //WEATHERCLOCK_TFTDISPLAY_H

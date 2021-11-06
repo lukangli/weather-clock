@@ -6,7 +6,7 @@
 #define WEATHERCLOCK_CITYWEATHER_H
 
 #include <ESP8266HTTPClient.h>
-
+#define BUFFER_SIZE 512
 typedef struct displayInfo {
     int tempnum = 0;   //温度百分比
     int huminum = 0;   //湿度百分比
@@ -19,6 +19,15 @@ typedef struct displayInfo {
     uint32_t pm25BgColor;
     int32_t weatherIcon;
     String scrollText[7]; //滚动显示
+
+    String tostring() const {
+        char buffer[BUFFER_SIZE];
+        sprintf(buffer, "tempnum = %d, huminum = %d, tempcol = %d, humicol = %d, cityName = %s, aqi = %s, pm25V = %d,"
+                        " pm25BgColor = %d, weatherIcon = %d", tempnum, huminum, tempcol, humicol, cityName.c_str(),
+                        aqi.c_str(), pm25V, pm25BgColor, weatherIcon);
+        String str(buffer);
+        return str;
+    }
 } DisplayInfo;
 
 typedef enum {
@@ -42,7 +51,7 @@ public:
     static CityWeather *getInstance();
 
     //获取天气信息
-    ErrorStatus getCityWeater();
+    ErrorStatus getCityWeather();
 private:
     //json解析
     ErrorStatus parseJson(String &jsonStr);

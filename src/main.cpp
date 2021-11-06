@@ -16,12 +16,12 @@ void setup() {
     WiFi.begin("kanglu", "zxcvbnm123");
     while (WiFi.status() != WL_CONNECTED) {
         if (tftDisplay->loading(30) >= 194) {
-            //web配网
+            //TODO web配网
             Serial.println("连接wifi失败！");
         }
     }
 
-    //走完动画
+    //走进度条完动画
     while (tftDisplay->loading(30) < 194);
     Serial.println("连接wifi成功！");
 
@@ -30,6 +30,4 @@ void setup() {
 }
 
 void loop() {
-    delay(2000);
-    Serial.println("clion hello!");
 }

@@ -21,8 +21,7 @@ CityWeather *CityWeather::getInstance() {
 }
 
 // 发送HTTP请求并且将服务器响应通过串口输出
-ErrorStatus CityWeather::getCityCode()
-{
+ErrorStatus CityWeather::getCityCode() {
     String url = URL_WEATHER + String(now());
 
     httpClient.begin(wifiClient, url);
@@ -41,7 +40,7 @@ ErrorStatus CityWeather::getCityCode()
         String str = httpClient.getString();
         int index = str.indexOf("id=");
         if (index > -1) {
-            cityCode = str.substring(index + 4,index + 4 + 9).toInt();
+            cityCode = str.substring(index + 4, index + 4 + 9).toInt();
             Serial.println(cityCode);
         } else {
             return FAILED;
@@ -57,8 +56,7 @@ ErrorStatus CityWeather::getCityCode()
 }
 
 // 获取城市天气
-ErrorStatus CityWeather::getCityWeater()
-{
+ErrorStatus CityWeather::getCityWeather() {
     if (!getCityCode()) {
         Serial.println("获取城市代号失败");
         return FAILED;
@@ -87,14 +85,13 @@ ErrorStatus CityWeather::getCityWeater()
         if (!parseJson(str)) {
             return FAILED;
         }
-        Serial.println("获取成功");
     } else {
         Serial.println("请求城市天气错误：");
         Serial.print(httpCode);
         httpClient.end();
         return FAILED;
     }
-
+    Serial.println("获取天气数据成功");
     //关闭ESP8266与服务器连接
     httpClient.end();
     return SUCCESS;
@@ -108,50 +105,58 @@ ErrorStatus CityWeather::getCityWeater()
 ErrorStatus CityWeather::parseJson(String &str) {
 
     if (str.isEmpty()) {
+        Serial.println("parseJson str is empty");
         return FAILED;
     }
 
     int indexStart = str.indexOf("weatherinfo\":");
     int indexEnd = str.indexOf("};var alarmDZ");
     if (indexStart < 0 || indexEnd < 0) {
+        Serial.println("weather info is error");
         return FAILED;
     }
 
-    String jsonCityDZ = str.substring(indexStart + 13,indexEnd);
+    String jsonCityDZ = str.substring(indexStart + 13, indexEnd);
 
     indexStart = str.indexOf("dataSK =");
     indexEnd = str.indexOf(";var dataZS");
     if (indexStart < 0 || indexEnd < 0) {
+        Serial.println("dataSK is error");
         return FAILED;
     }
 
-    String jsonDataSK = str.substring(indexStart + 8,indexEnd);
+    String jsonDataSK = str.substring(indexStart + 8, indexEnd);
 
     indexStart = str.indexOf("\"f\":[");
     indexEnd = str.indexOf(",{\"fa");
     if (indexStart < 0 || indexEnd < 0) {
+        Serial.println("fa is error");
         return FAILED;
     }
 
-    String jsonFC = str.substring(indexStart + 5,indexEnd);
+    String jsonFC = str.substring(indexStart + 5, indexEnd);
 
-    if (parseDisplayInfo(jsonCityDZ, jsonDataSK, jsonFC)) {
+    if (!parseDisplayInfo(jsonCityDZ, jsonDataSK, jsonFC)) {
+        Serial.println("显示信息解析错误");
         return FAILED;
     }
     return SUCCESS;
 }
 
-ErrorStatus CityWeather::parseDisplayInfo(String &dzJson, String &skJson, String &fcJson)
-{
+ErrorStatus CityWeather::parseDisplayInfo(String &dzJson, String &skJson, String &fcJson) {
     if (dzJson.isEmpty() || dzJson.isEmpty() || dzJson.isEmpty()) {
         return FAILED;
     }
 
+    Serial.println(dzJson);
+    Serial.println(skJson);
+    Serial.println(fcJson);
+
     DynamicJsonDocument doc(1024);
-    deserializeJson(doc, dzJson);
+    deserializeJson(doc, skJson);
     JsonObject sk = doc.as<JsonObject>();
 
-    info.tempnum = sk["temp"].as<int>() + 10;
+    info.tempnum = sk["temp"].as<int>();
     if (info.tempnum < 10)
         info.tempcol = 0x00FF;
     else if (info.tempnum < 28)
@@ -199,20 +204,20 @@ ErrorStatus CityWeather::parseDisplayInfo(String &dzJson, String &skJson, String
     info.scrollText[1] = "空气质量 " + info.aqi;
     info.scrollText[2] = "风向 " + sk["WD"].as<String>() + sk["WS"].as<String>();
 
-    info.weatherIcon =  (sk["weathercode"].as<String>()).substring(1,3).toInt();
+    info.weatherIcon = (sk["weathercode"].as<String>()).substring(1, 3).toInt();
 
     //左上角滚动字幕
     //解析第二段JSON
     deserializeJson(doc, dzJson);
     JsonObject dz = doc.as<JsonObject>();
 
-    info.scrollText[3] = "今日"+dz["weather"].as<String>();
+    info.scrollText[3] = "今日" + dz["weather"].as<String>();
 
     deserializeJson(doc, fcJson);
     JsonObject fc = doc.as<JsonObject>();
 
-    info.scrollText[4] = "最低温度"+fc["fd"].as<String>()+"℃";
-    info.scrollText[5] = "最高温度"+fc["fc"].as<String>()+"℃";
+    info.scrollText[4] = "最低温度" + fc["fd"].as<String>() + "℃";
+    info.scrollText[5] = "最高温度" + fc["fc"].as<String>() + "℃";
 
     return SUCCESS;
 }
