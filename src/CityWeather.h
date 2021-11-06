@@ -6,38 +6,45 @@
 #define WEATHERCLOCK_CITYWEATHER_H
 
 #include <ESP8266HTTPClient.h>
+
 #define BUFFER_SIZE 512
-typedef struct displayInfo {
-    int tempnum = 0;   //温度百分比
-    int huminum = 0;   //湿度百分比
-    int tempcol = 0xffff;   //温度显示颜色
-    int humicol = 0xffff;   //湿度显示颜色
+typedef struct displayInfo
+{
+    int tempNum = 0;   //温度百分比
+    int humidityNum = 0;   //湿度百分比
+    int tempCol = 0xffff;   //温度显示颜色
+    int humidityCol = 0xffff;   //湿度显示颜色
     int weatherCode = 0;
+    uint16_t pm25Num = 0;
+    uint32_t pm25BgColor = 0;
+    int32_t weatherIcon = 0;
     String cityName;
     String aqi;
-    uint16_t pm25V;
-    uint32_t pm25BgColor;
-    int32_t weatherIcon;
     String scrollText[7]; //滚动显示
 
-    String tostring() const {
+    String tostring() const
+    {
         char buffer[BUFFER_SIZE];
-        sprintf(buffer, "tempnum = %d, huminum = %d, tempcol = %d, humicol = %d, cityName = %s, aqi = %s, pm25V = %d,"
-                        " pm25BgColor = %d, weatherIcon = %d", tempnum, huminum, tempcol, humicol, cityName.c_str(),
-                        aqi.c_str(), pm25V, pm25BgColor, weatherIcon);
+        sprintf(buffer,
+                "tempNum = %d, humidityNum = %d, tempCol = %d, humidityCol = %d, cityName = %s, aqi = %s, pm25Num = %d,"
+                " pm25BgColor = %d, weatherIcon = %d", tempNum, humidityNum, tempCol, humidityCol, cityName.c_str(),
+                aqi.c_str(), pm25Num, pm25BgColor, weatherIcon);
         String str(buffer);
         return str;
     }
 } DisplayInfo;
 
-typedef enum {
+typedef enum
+{
     FAILED = 0,
     SUCCESS
 } ErrorStatus;
 
-class CityWeather {
+class CityWeather
+{
 private:
-    CityWeather() {
+    CityWeather()
+    {
         cityCode = 0;
     }
 
@@ -52,6 +59,7 @@ public:
 
     //获取天气信息
     ErrorStatus getCityWeather();
+
 private:
     //json解析
     ErrorStatus parseJson(String &jsonStr);

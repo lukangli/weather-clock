@@ -13,7 +13,8 @@
 #define URL "http://www.weather.com.cn/"
 #define URL_D1 "http://d1.weather.com.cn/weather_index/"
 
-CityWeather *CityWeather::getInstance() {
+CityWeather *CityWeather::getInstance()
+{
     if (instance == nullptr) {
         instance = new CityWeather;
     }
@@ -21,7 +22,8 @@ CityWeather *CityWeather::getInstance() {
 }
 
 // 发送HTTP请求并且将服务器响应通过串口输出
-ErrorStatus CityWeather::getCityCode() {
+ErrorStatus CityWeather::getCityCode()
+{
     String url = URL_WEATHER + String(now());
 
     httpClient.begin(wifiClient, url);
@@ -56,7 +58,8 @@ ErrorStatus CityWeather::getCityCode() {
 }
 
 // 获取城市天气
-ErrorStatus CityWeather::getCityWeather() {
+ErrorStatus CityWeather::getCityWeather()
+{
     if (!getCityCode()) {
         Serial.println("获取城市代号失败");
         return FAILED;
@@ -102,7 +105,8 @@ ErrorStatus CityWeather::getCityWeather() {
  * @param str 网站返回的天气信息
  * @return
  */
-ErrorStatus CityWeather::parseJson(String &str) {
+ErrorStatus CityWeather::parseJson(String &str)
+{
 
     if (str.isEmpty()) {
         Serial.println("parseJson str is empty");
@@ -143,59 +147,56 @@ ErrorStatus CityWeather::parseJson(String &str) {
     return SUCCESS;
 }
 
-ErrorStatus CityWeather::parseDisplayInfo(String &dzJson, String &skJson, String &fcJson) {
+ErrorStatus CityWeather::parseDisplayInfo(String &dzJson, String &skJson, String &fcJson)
+{
     if (dzJson.isEmpty() || dzJson.isEmpty() || dzJson.isEmpty()) {
         return FAILED;
     }
-
-    Serial.println(dzJson);
-    Serial.println(skJson);
-    Serial.println(fcJson);
 
     DynamicJsonDocument doc(1024);
     deserializeJson(doc, skJson);
     JsonObject sk = doc.as<JsonObject>();
 
-    info.tempnum = sk["temp"].as<int>();
-    if (info.tempnum < 10)
-        info.tempcol = 0x00FF;
-    else if (info.tempnum < 28)
-        info.tempcol = 0x0AFF;
-    else if (info.tempnum < 34)
-        info.tempcol = 0x0F0F;
-    else if (info.tempnum < 41)
-        info.tempcol = 0xFF0F;
-    else if (info.tempnum < 49)
-        info.tempcol = 0xF00F;
+    info.tempNum = sk["temp"].as<int>();
+    if (info.tempNum < 10)
+        info.tempCol = 0x00FF;
+    else if (info.tempNum < 28)
+        info.tempCol = 0x0AFF;
+    else if (info.tempNum < 34)
+        info.tempCol = 0x0F0F;
+    else if (info.tempNum < 41)
+        info.tempCol = 0xFF0F;
+    else if (info.tempNum < 49)
+        info.tempCol = 0xF00F;
     else {
-        info.tempcol = 0xF00F;
-        info.tempnum = 50;
+        info.tempCol = 0xF00F;
+        info.tempNum = 50;
     }
 
-    info.huminum = (sk["SD"].as<String>()).substring(0, 2).toInt();
-    if (info.huminum > 90)
-        info.humicol = 0x00FF;
-    else if (info.huminum > 70)
-        info.humicol = 0x0AFF;
-    else if (info.huminum > 40)
-        info.humicol = 0x0F0F;
-    else if (info.huminum > 20)
-        info.humicol = 0xFF0F;
+    info.humidityNum = (sk["SD"].as<String>()).substring(0, 2).toInt();
+    if (info.humidityNum > 90)
+        info.humidityCol = 0x00FF;
+    else if (info.humidityNum > 70)
+        info.humidityCol = 0x0AFF;
+    else if (info.humidityNum > 40)
+        info.humidityCol = 0x0F0F;
+    else if (info.humidityNum > 20)
+        info.humidityCol = 0xFF0F;
     else
-        info.humicol = 0xF00F;
+        info.humidityCol = 0xF00F;
 
     info.pm25BgColor = 0x880b20;//优
-    info.pm25V = sk["aqi"];
-    if (info.pm25V > 200) {
+    info.pm25Num = sk["aqi"];
+    if (info.pm25Num > 200) {
         info.pm25BgColor = 0x880b20;//重度 0x880b20
         info.aqi = "重度";
-    } else if (info.pm25V > 150) {
+    } else if (info.pm25Num > 150) {
         info.pm25BgColor = 0xba3779;//中度 0xba3779
         info.aqi = "中度";
-    } else if (info.pm25V > 100) {
+    } else if (info.pm25Num > 100) {
         info.pm25BgColor = 0xf29f39;//轻 0xf29f39
         info.aqi = "轻度";
-    } else if (info.pm25V > 50) {
+    } else if (info.pm25Num > 50) {
         info.pm25BgColor = 0xf7db64;//良 0xf7db64
         info.aqi = "良";
     }
@@ -204,6 +205,7 @@ ErrorStatus CityWeather::parseDisplayInfo(String &dzJson, String &skJson, String
     info.scrollText[1] = "空气质量 " + info.aqi;
     info.scrollText[2] = "风向 " + sk["WD"].as<String>() + sk["WS"].as<String>();
 
+    info.cityName = sk["cityname"].as<String>();
     info.weatherIcon = (sk["weathercode"].as<String>()).substring(1, 3).toInt();
 
     //左上角滚动字幕

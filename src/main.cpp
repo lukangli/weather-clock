@@ -2,16 +2,21 @@
 #include <EEPROM.h>
 #include <ESP8266WiFi.h>
 
+#include "TimeUtil.h"
 #include "TftDisplay.h"
 #include "CityWeather.h"
-TftDisplay* TftDisplay::instance = nullptr;
-CityWeather* CityWeather::instance = nullptr;
 
-void setup() {
+WiFiUDP *TimeUtil::wifiUdp = nullptr;
+TimeUtil *TimeUtil::instance = nullptr;
+TftDisplay *TftDisplay::instance = nullptr;
+CityWeather *CityWeather::instance = nullptr;
+
+void setup()
+{
     Serial.begin(115200);
     EEPROM.begin(1024);
 
-    TftDisplay*  tftDisplay  = TftDisplay::getInstance();
+    TftDisplay *tftDisplay = TftDisplay::getInstance();
 
     WiFi.begin("kanglu", "zxcvbnm123");
     while (WiFi.status() != WL_CONNECTED) {
@@ -27,7 +32,25 @@ void setup() {
 
     //显示天气信息
     TftDisplay::getInstance()->displayWeather();
+
+    TimeUtil *timeUtil = TimeUtil::getInstance();
 }
 
-void loop() {
+bool prevTime = false;
+time_t prevDisplay = 0;
+
+void loop()
+{
+    if (now() != prevDisplay) {
+        prevDisplay = now();
+        TftDisplay::getInstance()->displayDigitalClock();
+        prevTime=false;
+    }
+
+    if (second() % 2 == 0 && !prevTime) {
+        TftDisplay::getInstance()->scrollBanner();
+        prevTime = true;
+    }
+
+    TftDisplay::getInstance()->displaySpaceman();
 }

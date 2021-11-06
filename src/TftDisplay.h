@@ -4,9 +4,12 @@
 
 #ifndef WEATHERCLOCK_TFTDISPLAY_H
 #define WEATHERCLOCK_TFTDISPLAY_H
+
 #include <TFT_eSPI.h>
 #include <TJpg_Decoder.h>
+
 #include "CityWeather.h"
+#include "TimeUtil.h"
 
 #include "font/O_3660_i0.h"
 #include "font/O_3660_i1.h"
@@ -65,24 +68,46 @@
 #include "img/tianqi/t53.h"
 #include "img/tianqi/t99.h"
 
+#include "img/pangzi/i0.h"
+#include "img/pangzi/i1.h"
+#include "img/pangzi/i2.h"
+#include "img/pangzi/i3.h"
+#include "img/pangzi/i4.h"
+#include "img/pangzi/i5.h"
+#include "img/pangzi/i6.h"
+#include "img/pangzi/i7.h"
+#include "img/pangzi/i8.h"
+#include "img/pangzi/i9.h"
+
+
 #define LCD_BL_PIN 5    //LCD背光引脚
 #define VERSION   "V1.4"
 
-class TftDisplay {
+class TftDisplay
+{
 private:
     uint8_t lcdRotation = 0;   //LCD屏幕方向
     uint8_t lcdBlPwm = 100;//屏幕亮度0-100，默认50
     uint16_t bgColor = 0x0000;
+    uint16_t currentIndex = 0;
 
-    static TftDisplay* instance;
+    uint8_t Hour_sign   = 60;
+    uint8_t Minute_sign = 60;
+    uint8_t Second_sign = 60;
+
+    uint16_t Anim = 0;           //太空人图标显示指针记录
+    uint16_t AprevTime = 0;      //太空人更新时间记录
+
+    static TftDisplay *instance;
 
     TftDisplay();
-public:
+
     TFT_eSPI tft = TFT_eSPI();
     TFT_eSprite clk = TFT_eSprite(&tft);
+public:
 
     //单例模式
-    static TftDisplay* getInstance();
+    static TftDisplay *getInstance();
 
     //进度条加载
     uint16 loading(byte delayTime);
@@ -90,6 +115,14 @@ public:
     //显示天气到屏幕
     void displayWeather();
 
+    //天气信息滚动显示
+    void scrollBanner();
+
+    //显示时钟
+    void displayDigitalClock();
+
+    //显示太空人图片
+    void displaySpaceman();
 private:
     //显示温湿度到屏幕(进度条方式)
     void humidityTempProgressBar(int32_t num, int32_t col, int32_t x, int32_t y);
@@ -97,23 +130,23 @@ private:
     //显示温湿度到屏幕(数字方式)
     void humidityTempNum(const String &str, int32_t x, int32_t y);
 
-    //显示天气图标
-    void printfWeather(int x, int y, int num);
-
     //显示温湿度图标
     void displayTempHumidity();
 
+    //显示天气图标
+    static void printfWeather(int num);
+
     //显示白色36*60大小数字
-    void printfW3660(int x,int y,int num);
+    static void printfW3660(int x, int y, int num);
 
     //显示橙色36*60大小数字
-    void printfO3660(int x,int y,int num);
+    static void printfO3660(int x, int y, int num);
 
     //显示白色18*30大小数字
-    void printfW1830(int x,int y,int num);
+    static void printfW1830(int x, int y, int num);
 
     //图片显示回调函数
-    static bool tft_output(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t* bitmap);
+    static bool tft_output(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t *bitmap);
 };
 
 #endif //WEATHERCLOCK_TFTDISPLAY_H
