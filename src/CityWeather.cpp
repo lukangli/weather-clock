@@ -45,9 +45,11 @@ ErrorStatus CityWeather::getCityCode()
             cityCode = str.substring(index + 4, index + 4 + 9).toInt();
             Serial.println(cityCode);
         } else {
+            httpClient.end();
             return FAILED;
         }
     } else {
+        httpClient.end();
         Serial.println(httpCode);
         return FAILED;
     }
@@ -86,6 +88,7 @@ ErrorStatus CityWeather::getCityWeather()
 
         String str = httpClient.getString();
         if (!parseJson(str)) {
+            httpClient.end();
             return FAILED;
         }
     } else {
