@@ -9,7 +9,7 @@
 #include <TJpg_Decoder.h>
 
 #include "CityWeather.h"
-#include "TimeUtil.h"
+#include "TimeUtils.h"
 
 #include "font/O_3660_i0.h"
 #include "font/O_3660_i1.h"
@@ -86,8 +86,6 @@
 class TftDisplay
 {
 private:
-    uint8_t lcdRotation = 0;   //LCD屏幕方向
-    uint8_t lcdBlPwm = 100;//屏幕亮度0-100，默认50
     uint16_t bgColor = 0x0000;
     uint16_t currentIndex = 0;
 
@@ -123,6 +121,9 @@ public:
 
     //显示太空人图片
     void displaySpaceman();
+
+    //显示配网画面
+    void displayWebConfig();
 private:
     //显示温湿度到屏幕(进度条方式)
     void humidityTempProgressBar(int32_t num, int32_t col, int32_t x, int32_t y);

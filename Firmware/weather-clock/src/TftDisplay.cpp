@@ -6,6 +6,7 @@
 #include "humidity.h"
 #include "temperature.h"
 #include "ArduinoJson.h"
+#include "EepromUtils.h"
 #include "font/ZdyLwFont_20.h"
 
 TftDisplay::TftDisplay()
@@ -13,13 +14,13 @@ TftDisplay::TftDisplay()
     //设置背光引脚为输出模式
     pinMode(LCD_BL_PIN, OUTPUT);
     //输出PWM信号设置背光
-    analogWrite(LCD_BL_PIN, 1023 - (lcdBlPwm * 10));
+    analogWrite(LCD_BL_PIN, 1023 - (EepromUtils::getBacklight() * 10));
 
     /* TFT init */
     tft.begin();
     //反转所有显示颜色：true反转，false正常
     tft.invertDisplay(true);
-    tft.setRotation(lcdRotation);
+    tft.setRotation(EepromUtils::getScreenOrient());
     tft.fillScreen(0x0000);
     tft.setTextColor(TFT_BLACK, bgColor);
 
@@ -471,7 +472,7 @@ void TftDisplay::displayDigitalClock()
     clk.fillSprite(bgColor);
     clk.setTextDatum(CC_DATUM);
     clk.setTextColor(TFT_WHITE, bgColor);
-    clk.drawString(TimeUtil::getWeek(), 29, 16);
+    clk.drawString(TimeUtils::getWeek(), 29, 16);
     clk.pushSprite(102, 150);
     clk.deleteSprite();
 
@@ -480,9 +481,27 @@ void TftDisplay::displayDigitalClock()
     clk.fillSprite(bgColor);
     clk.setTextDatum(CC_DATUM);
     clk.setTextColor(TFT_WHITE, bgColor);
-    clk.drawString(TimeUtil::getMonthDay(), 49, 16);
+    clk.drawString(TimeUtils::getMonthDay(), 49, 16);
     clk.pushSprite(5, 150);
     clk.deleteSprite();
 
     clk.unloadFont();
+}
+
+void TftDisplay::displayWebConfig()
+{
+    clk.setColorDepth(8);
+
+    clk.createSprite(200, 60);//创建窗口
+    clk.fillSprite(0x0000);   //填充率
+
+    clk.setTextDatum(CC_DATUM);   //设置文本数据
+    clk.setTextColor(TFT_GREEN, 0x0000);
+    clk.drawString("WiFi Connect Fail!",100,10,2);
+    clk.drawString("SSID:",45,40,2);
+    clk.setTextColor(TFT_WHITE, 0x0000);
+    clk.drawString("AutoConnectAP",125,40,2);
+    clk.pushSprite(20,50);  //窗口位置
+
+    clk.deleteSprite();
 }

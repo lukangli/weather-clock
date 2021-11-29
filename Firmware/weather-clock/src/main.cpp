@@ -1,27 +1,30 @@
 #include <Arduino.h>
-#include <EEPROM.h>
 #include <ESP8266WiFi.h>
 
-#include "TimeUtil.h"
+#include "TimeUtils.h"
 #include "TftDisplay.h"
 #include "CityWeather.h"
+#include "EepromUtils.h"
+#include "WebConfig.h"
 
-WiFiUDP *TimeUtil::wifiUdp = nullptr;
-TimeUtil *TimeUtil::instance = nullptr;
+WiFiUDP *TimeUtils::wifiUdp = nullptr;
+TimeUtils *TimeUtils::instance = nullptr;
 TftDisplay *TftDisplay::instance = nullptr;
 CityWeather *CityWeather::instance = nullptr;
+EepromUtils *EepromUtils::instance = nullptr;
+WebConfig *WebConfig::instance = nullptr;
 
 void setup()
 {
     Serial.begin(115200);
-    EEPROM.begin(1024);
 
     TftDisplay *tftDisplay = TftDisplay::getInstance();
 
-    WiFi.begin("kanglu", "zxcvbnm123");
+    WiFi.begin("", "");
     while (WiFi.status() != WL_CONNECTED) {
         if (tftDisplay->loading(30) >= 194) {
-            //TODO web配网
+            TftDisplay::getInstance()->displayWebConfig();
+            WebConfig::getInstance()->webConfigInit();
             Serial.println("连接wifi失败！");
         }
     }
@@ -33,7 +36,7 @@ void setup()
     //显示天气信息
     TftDisplay::getInstance()->displayWeather();
 
-    TimeUtil *timeUtil = TimeUtil::getInstance();
+    TimeUtils *timeUtil = TimeUtils::getInstance();
 }
 
 bool prevTime = false;
@@ -41,12 +44,14 @@ time_t prevDisplay = 0;
 
 void loop()
 {
+    //更新时钟
     if (now() != prevDisplay) {
         prevDisplay = now();
         TftDisplay::getInstance()->displayDigitalClock();
         prevTime=false;
     }
 
+    //更新天气信息
     if (second() % 2 == 0 && !prevTime) {
         TftDisplay::getInstance()->scrollBanner();
         prevTime = true;

@@ -2,14 +2,14 @@
 // Created by lukang on 2021/11/6.
 //
 
-#include "TimeUtil.h"
+#include "TimeUtils.h"
 
 #define TIME_ZONE 8  // 东八区
 #define NTP_PACKET_SIZE 48
 
 static const char ntpServerName[] = "ntp6.aliyun.com";
 
-TimeUtil::TimeUtil()
+TimeUtils::TimeUtils()
 {
     wifiUdp = new WiFiUDP;
     //开启UDP传输
@@ -20,20 +20,20 @@ TimeUtil::TimeUtil()
     setSyncInterval(300);
 }
 
-TimeUtil::~TimeUtil()
+TimeUtils::~TimeUtils()
 {
     delete wifiUdp;
 }
 
-TimeUtil *TimeUtil::getInstance()
+TimeUtils *TimeUtils::getInstance()
 {
     if (instance == nullptr) {
-        instance = new TimeUtil;
+        instance = new TimeUtils;
     }
     return instance;
 }
 
-time_t TimeUtil::getNtpTime()
+time_t TimeUtils::getNtpTime()
 {
     IPAddress ntpServerIP; // NTP server's ip address
 
@@ -66,7 +66,7 @@ time_t TimeUtil::getNtpTime()
 }
 
 // 向NTP服务器发送请求
-byte* TimeUtil::sendNTPRequest(IPAddress &address)
+byte* TimeUtils::sendNTPRequest(IPAddress &address)
 {
     byte *buffer = new byte[NTP_PACKET_SIZE];
 
@@ -90,14 +90,14 @@ byte* TimeUtil::sendNTPRequest(IPAddress &address)
     return buffer;
 }
 
-String TimeUtil::getWeek()
+String TimeUtils::getWeek()
 {
     String weekList[7] = {"日", "一", "二", "三", "四", "五", "六"};
     String week = "周" + weekList[weekday() - 1];
     return week;
 }
 
-String TimeUtil::getMonthDay()
+String TimeUtils::getMonthDay()
 {
     String monthDay = String(month());
     monthDay = monthDay + "月" + String(day()) + "日";

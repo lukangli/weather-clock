@@ -2,25 +2,25 @@
 // Created by lukang on 2021/11/6.
 //
 
-#ifndef WEATHERCLOCK_TIMEUTIL_H
-#define WEATHERCLOCK_TIMEUTIL_H
+#ifndef WEATHERCLOCK_TIMEUTILS_H
+#define WEATHERCLOCK_TIMEUTILS_H
 
 #include <Arduino.h>
 #include <WiFiUdp.h>
 #include <TimeLib.h>
 #include <ESP8266WiFi.h>
 
-class TimeUtil
+class TimeUtils
 {
     static WiFiUDP *wifiUdp;
-    static TimeUtil *instance;
+    static TimeUtils *instance;
 
-    TimeUtil();
+    TimeUtils();
 
-    ~TimeUtil();
+    ~TimeUtils();
 public:
 
-    static TimeUtil *getInstance();
+    static TimeUtils *getInstance();
 
     //获取周
     static String getWeek();
@@ -36,4 +36,4 @@ private:
 };
 
 
-#endif //WEATHERCLOCK_TIMEUTIL_H
+#endif //WEATHERCLOCK_TIMEUTILS_H

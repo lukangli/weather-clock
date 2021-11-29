@@ -22,6 +22,7 @@ include_directories("./.pio/libdeps/espduino/TJpg_Decoder/src")
 include_directories("./.pio/libdeps/espduino/Time")
 include_directories("./.pio/libdeps/espduino/TFT_eSPI")
 include_directories("./.pio/libdeps/espduino/ArduinoJson/src")
+include_directories("./.pio/libdeps/espduino/WiFiManager")
 
 add_custom_target(
     Production ALL
@@ -35,4 +36,4 @@ add_custom_target(
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-add_executable(Z_DUMMY_TARGET ${SRC_LIST} src/TftDisplay.cpp src/TftDisplay.h src/CityWeather.cpp src/CityWeather.h src/TimeUtil.cpp src/TimeUtil.h)
+add_executable(Z_DUMMY_TARGET ${SRC_LIST} src/TftDisplay.cpp src/TftDisplay.h src/CityWeather.cpp src/CityWeather.h src/TimeUtils.cpp src/TimeUtils.h src/EepromUtils.cpp src/EepromUtils.h src/WebConfig.cpp src/WebConfig.h)
