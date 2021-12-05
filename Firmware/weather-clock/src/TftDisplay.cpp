@@ -14,7 +14,8 @@ TftDisplay::TftDisplay()
     //设置背光引脚为输出模式
     pinMode(LCD_BL_PIN, OUTPUT);
     //输出PWM信号设置背光
-    analogWrite(LCD_BL_PIN, 1023 - (EepromUtils::getBacklight() * 10));
+    //analogWrite(LCD_BL_PIN, 1023 - (EepromUtils::getBacklight() * 10));
+    analogWrite(LCD_BL_PIN, 1023 - (80 * 10));
 
     /* TFT init */
     tft.begin();
@@ -332,12 +333,10 @@ void TftDisplay::displaySpaceman()
 
 void TftDisplay::displayWeather()
 {
-    //获取天气信息
     if (!CityWeather::getInstance()->getCityWeather()) {
+        Serial.println("获取天气信息失败");
         return;
     }
-
-    displayTempHumidity();
 
     DisplayInfo *info = &CityWeather::getInstance()->info;
 
@@ -350,7 +349,7 @@ void TftDisplay::displayWeather()
     humidityTempProgressBar(info->tempNum, info->tempCol, 45, 192);
     //湿度
     humidityTempNum(String(info->humidityNum) + "%", 100, 214);
-    humidityTempProgressBar(info->humidityNum, info->humidityCol, 45, 222);
+    humidityTempProgressBar(info->humidityNum / 2, info->humidityCol, 45, 222);
 
     //城市名称
     clk.createSprite(94, 30);
@@ -500,7 +499,7 @@ void TftDisplay::displayWebConfig()
     clk.drawString("WiFi Connect Fail!",100,10,2);
     clk.drawString("SSID:",45,40,2);
     clk.setTextColor(TFT_WHITE, 0x0000);
-    clk.drawString("AutoConnectAP",125,40,2);
+    clk.drawString("helloWorld",125,40,2);
     clk.pushSprite(20,50);  //窗口位置
 
     clk.deleteSprite();

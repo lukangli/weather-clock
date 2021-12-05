@@ -81,7 +81,7 @@
 
 
 #define LCD_BL_PIN 5    //LCD背光引脚
-#define VERSION   "V1.4"
+#define VERSION   "V1.0"
 
 class TftDisplay
 {
@@ -124,15 +124,15 @@ public:
 
     //显示配网画面
     void displayWebConfig();
+
+    //显示温湿度图标
+    void displayTempHumidity();
 private:
     //显示温湿度到屏幕(进度条方式)
     void humidityTempProgressBar(int32_t num, int32_t col, int32_t x, int32_t y);
 
     //显示温湿度到屏幕(数字方式)
     void humidityTempNum(const String &str, int32_t x, int32_t y);
-
-    //显示温湿度图标
-    void displayTempHumidity();
 
     //显示天气图标
     static void printfWeather(int num);
